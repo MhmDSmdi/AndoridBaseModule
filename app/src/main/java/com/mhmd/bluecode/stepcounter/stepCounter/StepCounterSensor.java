@@ -5,18 +5,20 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 
-public class StepCounterSensorEvent implements StepCounterSensorEventListener {
+public class StepCounterSensor implements StepCounterSensorEventListener {
 
     private SensorManager sensorManager;
     private Sensor sensorStepCounter;
     private Sensor sensorStepDetector;
+    private StepCounterListener stepCounterListener;
     private Context mContext;
     private int stepsDetector = 0;
     private int stepInitializer = 0;
     private int stepCounter = 0;
 
-    public StepCounterSensorEvent(Context mContext) {
+    public StepCounterSensor(Context mContext, StepCounterListener stepCounterListener) {
         this.mContext = mContext;
+        this.stepCounterListener = stepCounterListener;
         sensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
         sensorStepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         sensorStepDetector = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
@@ -31,9 +33,11 @@ public class StepCounterSensorEvent implements StepCounterSensorEventListener {
                     stepInitializer = (int)sensorEvent.values[0];
                 }
                 stepCounter = (int)sensorEvent.values[0] - stepInitializer;
+                stepCounterListener.onUpdateStepCounter();
                 break;
             case Sensor.TYPE_STEP_DETECTOR:
                 stepsDetector++;
+                stepCounterListener.onUpdateStepDetector();
                 break;
         }
     }
@@ -54,4 +58,11 @@ public class StepCounterSensorEvent implements StepCounterSensorEventListener {
         sensorManager.unregisterListener(this);
     }
 
+    public int getStepsDetector() {
+        return stepsDetector;
+    }
+
+    public int getStepCounter() {
+        return stepCounter;
+    }
 }
