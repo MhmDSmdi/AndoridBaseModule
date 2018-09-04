@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.mhmd.bluecode.stepcounter.notificationManger.BaseNotificationManager;
+import com.mhmd.bluecode.stepcounter.notificationManger.MyBroadcastReceiver;
 import com.mhmd.bluecode.stepcounter.notificationManger.NotificationListener;
 
 public class SensorActivity extends AppCompatActivity implements NotificationListener {
@@ -43,12 +44,19 @@ public class SensorActivity extends AppCompatActivity implements NotificationLis
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
+        Intent snoozeIntent = new Intent(this, MyBroadcastReceiver.class);
+        snoozeIntent.setAction("SnoozeAction");
+        snoozeIntent.putExtra(getString(R.string.channelId), 0);
+        PendingIntent snoozePendingIntent = PendingIntent.getBroadcast(this, 0, snoozeIntent, 0);
+
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle("Some Text for Title")
                 .setContentText("SEOFIH ISEAFJ QE21OIE 2EOK3EP")
                 .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .addAction(R.drawable.ic_launcher_foreground, "SnoozeAction", snoozePendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         notificationManager.notifyNotification(mBuilder.build(), R.string.channelId);
