@@ -33,7 +33,7 @@ public class Timer {
     }
 
     private void startTimer() {
-         timePerSecond = hour * 3600 + minute * 60 + second;
+        timePerSecond = hour * 3600 + minute * 60 + second;
         listener.onStartTick();
         timePicker = new Runnable() {
             @Override
@@ -51,13 +51,16 @@ public class Timer {
     }
 
     private void startStopWatch() {
+        timePerSecond = 0;
         timePicker = new Runnable() {
             @Override
             public void run() {
-
+                timeHandler.postDelayed(timePicker, 1000);
+                listener.onTick(timePerSecond);
+                timePerSecond++;
             }
         };
-        new Thread(timePicker).start();
+        timeHandler.postAtTime(timePicker, 0);
     }
 
     public void setHour(int hour) {

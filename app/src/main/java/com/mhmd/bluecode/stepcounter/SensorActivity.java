@@ -37,10 +37,7 @@ public class SensorActivity extends AppCompatActivity implements TimeListener {
         txtSensorList = findViewById(R.id.txt_availableSensor);
         txtSensorList.setMovementMethod(new ScrollingMovementMethod());
         btnGetSensorList = findViewById(R.id.btn_sensorList);
-        timer = new Timer(Timer.TimerType.TIMER, this);
-        timer.setHour(0);
-        timer.setMinute(0);
-        timer.setSecond(10);
+        timer = new Timer(Timer.TimerType.STOP_WATCH, this);
         timer.start();
         /*LocationManager locationManager = (LocationManager) this
                 .getSystemService(Context.LOCATION_SERVICE);
