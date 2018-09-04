@@ -18,15 +18,17 @@ import android.widget.Toast;
 
 import com.mhmd.bluecode.stepcounter.stepCounter.StepCounterListener;
 import com.mhmd.bluecode.stepcounter.stepCounter.StepCounterSensor;
+import com.mhmd.bluecode.stepcounter.timer.TimeListener;
+import com.mhmd.bluecode.stepcounter.timer.Timer;
 
 import java.util.List;
 
-public class SensorActivity extends AppCompatActivity implements StepCounterListener {
+public class SensorActivity extends AppCompatActivity implements TimeListener {
 
-    private static final String TAG = "tag";
+    private static final String TAG = "tesst";
     private TextView txtSensorList;
     private Button btnGetSensorList;
-    private StepCounterSensor sensor;
+    private Timer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +37,12 @@ public class SensorActivity extends AppCompatActivity implements StepCounterList
         txtSensorList = findViewById(R.id.txt_availableSensor);
         txtSensorList.setMovementMethod(new ScrollingMovementMethod());
         btnGetSensorList = findViewById(R.id.btn_sensorList);
-        sensor = new StepCounterSensor(this, this);
-        LocationManager locationManager = (LocationManager) this
+        timer = new Timer(Timer.TimerType.TIMER, this);
+        timer.setHour(0);
+        timer.setMinute(0);
+        timer.setSecond(10);
+        timer.start();
+        /*LocationManager locationManager = (LocationManager) this
                 .getSystemService(Context.LOCATION_SERVICE);
 
         LocationListener locationListener = new LocationListener() {
@@ -64,7 +70,7 @@ public class SensorActivity extends AppCompatActivity implements StepCounterList
 
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-                0, locationListener);
+                0, locationListener);*/
 
 
 
@@ -82,21 +88,25 @@ public class SensorActivity extends AppCompatActivity implements StepCounterList
     @Override
     protected void onResume() {
         super.onResume();
-        sensor.onRegisterSensor();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        sensor.onUnRegisterSensor();
     }
 
     @Override
-    public void onUpdateStepCounter(int steps) {
-        txtSensorList.setText(steps + "");
+    public void onTick(int timePerSecond) {
+        Log.wtf(TAG, "onTick: " + timePerSecond);
     }
 
     @Override
-    public void onUpdateStepDetector(int stepDetector) {
+    public void onFinish() {
+        Log.wtf(TAG, "onFinish: ");
+    }
+
+    @Override
+    public void onStartTick() {
+        Log.wtf(TAG, "onStartTick: " );
     }
 }

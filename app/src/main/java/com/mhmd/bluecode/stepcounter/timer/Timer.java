@@ -1,12 +1,16 @@
 package com.mhmd.bluecode.stepcounter.timer;
 
+import android.os.Handler;
+
+
 public class Timer {
 
     private TimerType timerType;
     private TimeListener listener;
     private int hour, minute, second;
-    private int timeSecond = 0;
+    private int timePerSecond = 0;
     private Runnable timePicker;
+    private Handler timeHandler = new Handler();
 
     public Timer(TimerType type, TimeListener listener) {
         this.timerType = type;
@@ -24,37 +28,26 @@ public class Timer {
         }
     }
 
-    public void cansel() {
-        if (timePicker != null) {
-            try {
-                timePicker.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
+    public void cancel() {
+        timeHandler.removeCallbacks(timePicker);
     }
 
     private void startTimer() {
-        timeSecond = hour * 3600 + minute * 60 + second;
-        listener.onStart();
+         timePerSecond = hour * 3600 + minute * 60 + second;
+        listener.onStartTick();
         timePicker = new Runnable() {
             @Override
             public void run() {
-                timeSecond--;
-                if (timeSecond == 0) {
+                timeHandler.postDelayed(this, 1000);
+                listener.onTick( timePerSecond);
+                timePerSecond--;
+                if (timePerSecond == 0) {
                     listener.onFinish();
-                    cansel();
-                }
-                try {
-                    listener.onTick();
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    cancel();
                 }
             }
         };
-        new Thread(timePicker).start();
+        timeHandler.postAtTime(timePicker, 0);
     }
 
     private void startStopWatch() {
@@ -79,7 +72,7 @@ public class Timer {
         this.second = second;
     }
 
-    enum TimerType {
+    public enum TimerType {
         TIMER,
         STOP_WATCH
     }
