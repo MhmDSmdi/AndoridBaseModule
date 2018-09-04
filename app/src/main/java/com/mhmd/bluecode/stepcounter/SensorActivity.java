@@ -1,34 +1,27 @@
 package com.mhmd.bluecode.stepcounter;
 
-import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.hardware.Sensor;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.mhmd.bluecode.stepcounter.reminder.AlarmNotificationService;
-import com.mhmd.bluecode.stepcounter.reminder.AlarmReceiver;
-import com.mhmd.bluecode.stepcounter.reminder.AlarmSoundService;
+import com.mhmd.bluecode.stepcounter.notificationManger.BaseNotificationManager;
+import com.mhmd.bluecode.stepcounter.notificationManger.NotificationListener;
 
-import java.util.Calendar;
-import java.util.List;
-
-public class SensorActivity extends AppCompatActivity {
+public class SensorActivity extends AppCompatActivity implements NotificationListener {
 
     private static final String TAG = "tesst";
+    private static final String channelId = "notif.channel1";
     private static final int ALARM_REQUEST_CODE = 133;
     private TextView txtSensorList;
     private Button btnGetSensorList;
-    private PendingIntent pendingIntent;
-
+    private BaseNotificationManager notificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,15 +30,30 @@ public class SensorActivity extends AppCompatActivity {
         txtSensorList = findViewById(R.id.txt_availableSensor);
         txtSensorList.setMovementMethod(new ScrollingMovementMethod());
         btnGetSensorList = findViewById(R.id.btn_sensorList);
-        Intent alarmIntent = new Intent(SensorActivity.this, AlarmReceiver.class);
-        pendingIntent = PendingIntent.getBroadcast(SensorActivity.this, ALARM_REQUEST_CODE, alarmIntent, 0);
-        triggerAlarmManager(1);
         btnGetSensorList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                stopAlarmManager();
+
             }
         });
+        notificationManager = new BaseNotificationManager(this, this);
+        notificationManager.createNotificationChannel(R.string.channelName, R.string.channelDescription, channelId, NotificationManager.IMPORTANCE_DEFAULT);
+
+        Intent intent = new Intent(this, SensorActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("Some Text for Title")
+                .setContentText("SEOFIH ISEAFJ QE21OIE 2EOK3EP")
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        notificationManager.notifyNotification(mBuilder.build(), R.string.channelId);
+
+
         /*LocationManager locationManager = (LocationManager) this
                 .getSystemService(Context.LOCATION_SERVICE);
 
@@ -80,33 +88,6 @@ public class SensorActivity extends AppCompatActivity {
 
     }
 
-    public void listLogger(List<Sensor> list, TextView textView) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Sensor sensor : list) {
-            stringBuilder.append(sensor.toString());
-            stringBuilder.append("\n -------------------------- \n");
-        }
-        textView.setText(stringBuilder.toString());
-    }
-
-    //Trigger alarm manager with entered time interval
-    public void triggerAlarmManager(int alarmTriggerTime) {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, alarmTriggerTime);
-        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);//get instance of alarm manager
-        manager.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);//set alarm manager with entered timer by converting into milliseconds
-        Toast.makeText(this, "Alarm Set for " + alarmTriggerTime + " seconds.", Toast.LENGTH_SHORT).show();
-    }
-
-    public void stopAlarmManager() {
-        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        manager.cancel(pendingIntent);//cancel the alarm manager of the pending intent
-        stopService(new Intent(SensorActivity.this, AlarmSoundService.class));
-        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(AlarmNotificationService.NOTIFICATION_ID);
-        Toast.makeText(this, "Alarm Canceled/Stop by User.", Toast.LENGTH_SHORT).show();
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -115,5 +96,10 @@ public class SensorActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    @Override
+    public void onSendNotification() {
+
     }
 }

@@ -4,5 +4,4 @@ public interface NotificationListener {
 
     void onSendNotification();
 
-
 }
