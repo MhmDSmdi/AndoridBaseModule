@@ -1,4 +1,4 @@
-package com.mhmd.bluecode.stepcounter.reminder;
+package com.mhmd.bluecode.stepcounter.notificationManger;
 
 import android.app.Service;
 import android.content.Intent;
@@ -7,10 +7,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.mhmd.bluecode.stepcounter.R;
-
-/**
- * Created by sonu on 10/04/17.
- */
 
 public class AlarmSoundService extends Service {
 

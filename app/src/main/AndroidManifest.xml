@@ -24,6 +24,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".notificationManger.AlarmNotificationService" />
+        <service android:name=".notificationManger.AlarmSoundService" />
+        <receiver android:name=".notificationManger.AlarmReceiver" />
+
     </application>
 
 </manifest>
