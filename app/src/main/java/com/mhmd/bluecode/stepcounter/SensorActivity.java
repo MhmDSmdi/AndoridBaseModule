@@ -1,8 +1,11 @@
 package com.mhmd.bluecode.stepcounter;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -37,30 +40,29 @@ public class SensorActivity extends AppCompatActivity implements NotificationLis
 
             }
         });
+
         notificationManager = new BaseNotificationManager(this, this);
         notificationManager.createNotificationChannel(R.string.channelName, R.string.channelDescription, channelId, NotificationManager.IMPORTANCE_DEFAULT);
-
         Intent intent = new Intent(this, SensorActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
         Intent snoozeIntent = new Intent(this, MyBroadcastReceiver.class);
         snoozeIntent.setAction("SnoozeAction");
         snoozeIntent.putExtra(getString(R.string.channelId), 0);
         PendingIntent snoozePendingIntent = PendingIntent.getBroadcast(this, 0, snoozeIntent, 0);
-
-
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("Some Text for Title")
-                .setContentText("SEOFIH ISEAFJ QE21OIE 2EOK3EP")
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-                .addAction(R.drawable.ic_launcher_foreground, "SnoozeAction", snoozePendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-        notificationManager.notifyNotification(mBuilder.build(), R.string.channelId);
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            Notification.Builder builder = new Notification.Builder(this);
+            builder.setContentTitle("Scheduled Notification");
+            builder.setContentText("12412e4dqew3edqwe");
+            builder.setContentIntent(pendingIntent);
+            builder.setSmallIcon(R.drawable.ic_launcher_background);
+            builder.addAction(R.drawable.ic_launcher_foreground, "sdf", snoozePendingIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                builder.setChannelId(channelId);
+            }
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            this.notificationManager.notifyNotification(builder.build(), 0);;
+        }
 
         /*LocationManager locationManager = (LocationManager) this
                 .getSystemService(Context.LOCATION_SERVICE);

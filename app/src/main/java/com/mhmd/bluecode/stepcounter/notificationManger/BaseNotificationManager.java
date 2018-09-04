@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
 
 import com.mhmd.bluecode.stepcounter.R;
 
@@ -42,6 +43,7 @@ public class BaseNotificationManager {
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(R.color.colorAccent);
             notificationChannel.canShowBadge();
+            notificationChannel.setDescription(mContext.getString(channelDescriptionResource));
             notificationManager.createNotificationChannel(notificationChannel);
         }
     }
