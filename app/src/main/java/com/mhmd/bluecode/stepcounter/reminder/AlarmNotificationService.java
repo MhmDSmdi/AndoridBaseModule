@@ -22,7 +22,7 @@ public class AlarmNotificationService extends IntentService {
 
     @Override
     public void onHandleIntent(Intent intent) {
-        int type = intent.getIntExtra("NOTIFICATION_TYPE", -1);
+        int type = intent.getIntExtra(SensorActivity.NOTIFICATION_ID, -1);
         sendNotification(type);
     }
 
