@@ -1,34 +1,34 @@
 package com.mhmd.bluecode.stepcounter;
 
-import android.Manifest;
+import android.app.AlarmManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.hardware.Sensor;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mhmd.bluecode.stepcounter.stepCounter.StepCounterListener;
-import com.mhmd.bluecode.stepcounter.stepCounter.StepCounterSensor;
-import com.mhmd.bluecode.stepcounter.timer.TimeListener;
-import com.mhmd.bluecode.stepcounter.timer.Timer;
+import com.mhmd.bluecode.stepcounter.notificationManger.AlarmNotificationService;
+import com.mhmd.bluecode.stepcounter.notificationManger.AlarmReceiver;
+import com.mhmd.bluecode.stepcounter.notificationManger.AlarmSoundService;
 
+import java.util.Calendar;
 import java.util.List;
 
-public class SensorActivity extends AppCompatActivity implements TimeListener {
+public class SensorActivity extends AppCompatActivity {
 
     private static final String TAG = "tesst";
+    private static final int ALARM_REQUEST_CODE = 133;
     private TextView txtSensorList;
     private Button btnGetSensorList;
-    private Timer timer;
+    private PendingIntent pendingIntent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +37,15 @@ public class SensorActivity extends AppCompatActivity implements TimeListener {
         txtSensorList = findViewById(R.id.txt_availableSensor);
         txtSensorList.setMovementMethod(new ScrollingMovementMethod());
         btnGetSensorList = findViewById(R.id.btn_sensorList);
-        timer = new Timer(Timer.TimerType.STOP_WATCH, this);
-        timer.start();
+        Intent alarmIntent = new Intent(SensorActivity.this, AlarmReceiver.class);
+        pendingIntent = PendingIntent.getBroadcast(SensorActivity.this, ALARM_REQUEST_CODE, alarmIntent, 0);
+        triggerAlarmManager(1);
+        btnGetSensorList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                stopAlarmManager();
+            }
+        });
         /*LocationManager locationManager = (LocationManager) this
                 .getSystemService(Context.LOCATION_SERVICE);
 
@@ -82,6 +89,24 @@ public class SensorActivity extends AppCompatActivity implements TimeListener {
         textView.setText(stringBuilder.toString());
     }
 
+    //Trigger alarm manager with entered time interval
+    public void triggerAlarmManager(int alarmTriggerTime) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.SECOND, alarmTriggerTime);
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);//get instance of alarm manager
+        manager.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);//set alarm manager with entered timer by converting into milliseconds
+        Toast.makeText(this, "Alarm Set for " + alarmTriggerTime + " seconds.", Toast.LENGTH_SHORT).show();
+    }
+
+    public void stopAlarmManager() {
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        manager.cancel(pendingIntent);//cancel the alarm manager of the pending intent
+        stopService(new Intent(SensorActivity.this, AlarmSoundService.class));
+        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(AlarmNotificationService.NOTIFICATION_ID);
+        Toast.makeText(this, "Alarm Canceled/Stop by User.", Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -90,20 +115,5 @@ public class SensorActivity extends AppCompatActivity implements TimeListener {
     @Override
     protected void onPause() {
         super.onPause();
-    }
-
-    @Override
-    public void onTick(int timePerSecond) {
-        Log.wtf(TAG, "onTick: " + timePerSecond);
-    }
-
-    @Override
-    public void onFinish() {
-        Log.wtf(TAG, "onFinish: ");
-    }
-
-    @Override
-    public void onStartTick() {
-        Log.wtf(TAG, "onStartTick: " );
     }
 }

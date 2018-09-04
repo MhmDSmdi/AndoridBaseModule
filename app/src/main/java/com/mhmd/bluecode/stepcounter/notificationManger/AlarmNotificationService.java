@@ -12,35 +12,37 @@ import com.mhmd.bluecode.stepcounter.SensorActivity;
 
 public class AlarmNotificationService extends IntentService {
 
-    private static final int NOTIFICATION_ID = 1;
-    private AlarmNotificationListener listener;
+    private NotificationManager alarmNotificationManager;
 
+    //Notification ID for Alarm
+    public static final int NOTIFICATION_ID = 1;
 
-    public AlarmNotificationService(AlarmNotificationListener listener) {
+    public AlarmNotificationService() {
         super("AlarmNotificationService");
-        this.listener = listener;
     }
 
     @Override
     public void onHandleIntent(Intent intent) {
-        listener.sendNotificationOnIntentCalled();
+        //Send notification
+//        sendNotification("Wake Up! Wake Up! Alarm started!!");
     }
 
-   /* //handle notification
+    //handle notification
     private void sendNotification(String msg) {
-        NotificationManager alarmNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, SensorActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-        //Create notification
+        alarmNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+        //get pending intent
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, SensorActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder alarmNotificationBuilder = new NotificationCompat.Builder(
+        //Create notification
+        NotificationCompat.Builder alamNotificationBuilder = new NotificationCompat.Builder(
                 this).setContentTitle("Alarm").setSmallIcon(R.mipmap.ic_launcher)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
                 .setContentText(msg).setAutoCancel(true);
-        alarmNotificationBuilder.setContentIntent(contentIntent);
+        alamNotificationBuilder.setContentIntent(contentIntent);
 
-        //notify notification manager about new notification
-        alarmNotificationManager.notify(NOTIFICATION_ID, alarmNotificationBuilder.build());
-    }*/
-
+        //notiy notification manager about new notification
+        alarmNotificationManager.notify(NOTIFICATION_ID, alamNotificationBuilder.build());
+    }
 
 }
