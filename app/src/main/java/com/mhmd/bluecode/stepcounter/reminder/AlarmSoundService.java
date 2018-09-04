@@ -1,4 +1,4 @@
-package com.mhmd.bluecode.stepcounter.notificationManger;
+package com.mhmd.bluecode.stepcounter.reminder;
 
 import android.app.Service;
 import android.content.Intent;

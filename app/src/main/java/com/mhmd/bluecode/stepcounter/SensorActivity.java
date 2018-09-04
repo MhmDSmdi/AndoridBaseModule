@@ -14,9 +14,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mhmd.bluecode.stepcounter.notificationManger.AlarmNotificationService;
-import com.mhmd.bluecode.stepcounter.notificationManger.AlarmReceiver;
-import com.mhmd.bluecode.stepcounter.notificationManger.AlarmSoundService;
+import com.mhmd.bluecode.stepcounter.reminder.AlarmNotificationService;
+import com.mhmd.bluecode.stepcounter.reminder.AlarmReceiver;
+import com.mhmd.bluecode.stepcounter.reminder.AlarmSoundService;
 
 import java.util.Calendar;
 import java.util.List;
