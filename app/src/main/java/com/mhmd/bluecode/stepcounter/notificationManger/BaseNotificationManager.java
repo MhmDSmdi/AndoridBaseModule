@@ -5,7 +5,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.support.v4.app.NotificationManagerCompat;
-import android.util.Log;
 
 import com.mhmd.bluecode.stepcounter.R;
 

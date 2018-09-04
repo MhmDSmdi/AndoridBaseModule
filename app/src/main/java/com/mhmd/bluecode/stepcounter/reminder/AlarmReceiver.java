@@ -15,6 +15,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         Toast.makeText(context, "OnReceive", Toast.LENGTH_LONG).show();
         context.startService(new Intent(context, AlarmSoundService.class));
         ComponentName comp = new ComponentName(context.getPackageName(), AlarmNotificationService.class.getName());
+//        intent.putExtra("NOTIFICATION_TYPE", );
         startWakefulService(context, (intent.setComponent(comp)));
     }
 

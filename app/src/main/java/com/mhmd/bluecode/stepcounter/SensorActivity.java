@@ -1,34 +1,37 @@
 package com.mhmd.bluecode.stepcounter;
 
-import android.app.Notification;
-import android.app.NotificationManager;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mhmd.bluecode.stepcounter.notificationManger.BaseNotificationManager;
-import com.mhmd.bluecode.stepcounter.notificationManger.MyBroadcastReceiver;
 import com.mhmd.bluecode.stepcounter.notificationManger.NotificationListener;
+import com.mhmd.bluecode.stepcounter.reminder.AlarmReceiver;
+import com.mhmd.bluecode.stepcounter.reminder.AlarmSoundService;
+
+import java.util.Calendar;
 
 public class SensorActivity extends AppCompatActivity implements NotificationListener {
 
     private static final String TAG = "tesst";
     private static final String channelId = "notif.channel1";
+    public static final String NOTIFICATION_ID = "NOTIFICATION_ID";
     private static final int ALARM_REQUEST_CODE = 133;
     private TextView txtSensorList;
     private Button btnGetSensorList;
     private BaseNotificationManager notificationManager;
+    PendingIntent pendingIntent;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         txtSensorList = findViewById(R.id.txt_availableSensor);
@@ -37,64 +40,15 @@ public class SensorActivity extends AppCompatActivity implements NotificationLis
         btnGetSensorList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                stopAlarmManager();
             }
         });
 
-        notificationManager = new BaseNotificationManager(this, this);
-        notificationManager.createNotificationChannel(R.string.channelName, R.string.channelDescription, channelId, NotificationManager.IMPORTANCE_DEFAULT);
-        Intent intent = new Intent(this, SensorActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        Intent snoozeIntent = new Intent(this, MyBroadcastReceiver.class);
-        snoozeIntent.setAction("SnoozeAction");
-        snoozeIntent.putExtra(getString(R.string.channelId), 0);
-        PendingIntent snoozePendingIntent = PendingIntent.getBroadcast(this, 0, snoozeIntent, 0);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            Notification.Builder builder = new Notification.Builder(this);
-            builder.setContentTitle("Scheduled Notification");
-            builder.setContentText("12412e4dqew3edqwe");
-            builder.setContentIntent(pendingIntent);
-            builder.setSmallIcon(R.drawable.ic_launcher_background);
-            builder.addAction(R.drawable.ic_launcher_foreground, "sdf", snoozePendingIntent);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                builder.setChannelId(channelId);
-            }
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            this.notificationManager.notifyNotification(builder.build(), 0);;
-        }
+        Intent alarmIntent = new Intent(SensorActivity.this, AlarmReceiver.class);
+        alarmIntent.putExtra(NOTIFICATION_ID, 234);
+        pendingIntent = PendingIntent.getBroadcast(SensorActivity.this, ALARM_REQUEST_CODE, alarmIntent, 0);
 
-        /*LocationManager locationManager = (LocationManager) this
-                .getSystemService(Context.LOCATION_SERVICE);
-
-        LocationListener locationListener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                location.getLatitude();
-                Toast.makeText(SensorActivity.this, "Current speed:" + (location.getSpeed()*3600.0)/1000.0, Toast.LENGTH_SHORT).show();
-            }
-
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-
-            public void onProviderEnabled(String provider) {
-            }
-
-            public void onProviderDisabled(String provider) {
-            }
-        };
-
-        if (ActivityCompat.checkSelfPermission(SensorActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(SensorActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(SensorActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            return;
-        }else{
-            // Write you code here if permission already given.
-        }
-
-
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-                0, locationListener);*/
-
-
+        triggerAlarmManager(2);
 
     }
 
@@ -106,6 +60,23 @@ public class SensorActivity extends AppCompatActivity implements NotificationLis
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    public void triggerAlarmManager(int alarmTriggerTime) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.SECOND, alarmTriggerTime);
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        manager.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
+        Toast.makeText(this, "Alarm Set for " + alarmTriggerTime + " seconds.", Toast.LENGTH_SHORT).show();
+    }
+
+    public void stopAlarmManager() {
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        manager.cancel(pendingIntent);//cancel the alarm manager of the pending intent
+        stopService(new Intent(SensorActivity.this, AlarmSoundService.class));
+//        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+//        notificationManager.cancel(AlarmNotificationService.);
+        Toast.makeText(this, "Alarm Canceled/Stop by User.", Toast.LENGTH_SHORT).show();
     }
 
     @Override
