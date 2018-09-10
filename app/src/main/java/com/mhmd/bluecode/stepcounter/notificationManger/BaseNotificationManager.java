@@ -1,14 +1,22 @@
 package com.mhmd.bluecode.stepcounter.notificationManger;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.NotificationManagerCompat;
+import android.widget.Toast;
 
 import com.mhmd.bluecode.stepcounter.R;
+import com.mhmd.bluecode.stepcounter.SensorActivity;
+import com.mhmd.bluecode.stepcounter.reminder.AlarmNotificationService;
+import com.mhmd.bluecode.stepcounter.reminder.AlarmSoundService;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 
@@ -52,5 +60,20 @@ public class BaseNotificationManager {
             listener.onSendNotification();
         notificationList.add(notification);
         compatNotificationManager.notify(id, notification);
+    }
+
+    public void triggerAlarmManager(int alarmTriggerTime, PendingIntent pendingIntent) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.SECOND, alarmTriggerTime);
+        AlarmManager manager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+        manager.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
+        Toast.makeText(mContext, "Alarm Set for " + alarmTriggerTime + " seconds.", Toast.LENGTH_SHORT).show();
+    }
+
+    public void stopAlarmManager(PendingIntent pendingIntent) {
+        AlarmManager manager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+        manager.cancel(pendingIntent);
+        mContext.stopService(new Intent(mContext, AlarmSoundService.class));
+        Toast.makeText(mContext, "Alarm Canceled/Stop by User.", Toast.LENGTH_SHORT).show();
     }
 }
